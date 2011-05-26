@@ -7,15 +7,12 @@ class Game
     @guess_history = ""
     @hint_history = ""
     @hint = []
+    @code = Array.new(4)
   end
 
   def code
-    @code = [:blue, :blue, :yellow, :red]
-    #secret_code = Array.new(4) {|e| e = the_code[rand 3]}
-  end
-
-  def prompt
-
+    possible_colors = [:blue, :red, :green, :yellow]
+    @code.map {|e| e = possible_colors[rand 3]}
   end
 
   def guess
@@ -30,7 +27,7 @@ class Game
      black_check = Array.new
      white_check = Array.new
 
-    @code.each_with_index { |c, i|
+    @code.each_with_index{ |c, i|
       if(@guess[i] == c)
         black_check<<:black
         @guess[i] = nil
@@ -69,10 +66,11 @@ class Game
   end
 
   def display_history
-    line = "Guess: "
+    line = "Guess List: \n"
     line<< guess_history
     line<< "  |  Hint: "
     line<< hint_history
+    line
   end
 
   def intro
@@ -81,12 +79,19 @@ class Game
         " guess the correct colors of the pegs in the right order. With each guess you could be given hint pegs.\n" +
         " A black hint peg means one of your colors is the right color in the right position. A white hint peg\n" +
         " means you have guessed a correct color, but it is in the wrong position. The game continues until you\n" +
-        " have guessed the right combination of colors or you have ran out of guesses"
+        " have guessed the right combination of colors or you have ran out of guesses\n\n"
   end
 
   def run_game
-    intro
+    print intro
     @number_of_guesses= 10
-
+    code
   end
 end
+#
+#class App
+#
+#game = Game.new
+#
+#game.run_game
+#end

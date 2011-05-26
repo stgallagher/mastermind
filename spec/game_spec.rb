@@ -49,7 +49,7 @@ describe Game do
     game1 = Game.new
     game2 = Game.new
 
-#    game1.code.should_not == game2.code
+    game1.code.should_not == game2.code
   end
 
 #  it "should have a prompt message that asks the user for a guess" do
@@ -204,7 +204,7 @@ describe Game do
     game.guess = [:blue, :blue, :red, :yellow]
     game.code = [:red, :yellow, :blue, :blue]
     game.hint
-    game.display_history.should == "Guess: blue -- blue -- red -- yellow  |  Hint: white -- white -- white -- white"
+    game.display_history.should == "Guess List: \nblue -- blue -- red -- yellow  |  Hint: white -- white -- white -- white"
   end
 
   it "intro should display game title and instructions" do
@@ -214,7 +214,7 @@ describe Game do
         " guess the correct colors of the pegs in the right order. With each guess you could be given hint pegs.\n" +
         " A black hint peg means one of your colors is the right color in the right position. A white hint peg\n" +
         " means you have guessed a correct color, but it is in the wrong position. The game continues until you\n" +
-        " have guessed the right combination of colors or you have ran out of guesses"
+        " have guessed the right combination of colors or you have ran out of guesses\n\n"
     end
 
   it "prompt should receive a guess input from user" do
@@ -222,7 +222,11 @@ describe Game do
     game = Game.new(io)
     io.gets_values<< "red,red,red,red"
 
-    game.guess.should == "red,red,red,red"
+    game.guess.should == [:red, :red, :red, :red]
+  end
+
+  it "game run method should take in secret code" do
+    game = Game.new
+    game.run_game
     end
 end
-
