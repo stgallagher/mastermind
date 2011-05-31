@@ -1,51 +1,60 @@
 class Game
 
-  attr_accessor :code, :guess, :hint, :guess_history, :hint_history, :number_of_guesses
+  attr_accessor :code, :guess, :hint, :guess_line, :hint_line, :history, :number_of_guesses_left
 
   def initialize(io = Kernel)
     @io = io
-    @guess_history = ""
-    @hint_history = ""
-    @hint = []
     @code = Array.new(4)
+    @hint = []
+    @guess_line = ""
+    @hint_line = ""
+    @history = ""
+    @number_of_guesses_left = 10
   end
 
-  def code
+  def set_secret_code
     possible_colors = [:blue, :red, :green, :yellow]
-    @code.map {|e| e = possible_colors[rand 3]}
+    @code.map! do |e|
+      e = possible_colors[rand 4]
+    end
   end
 
   def guess
-   # input = StringIO.new("blue,blue,red,yellow")
-   #
-   # $stdin = input
+    @number_of_guesses_left -= 1
     @io.print "Enter a guess: "
-    @guess = @io.gets.split(/,/).map{|i| i.to_sym}
+    input = @io.gets.strip
+    @guess = input.split(/,/).map{|i| i.to_sym}
+
   end
 
-  def hint
+  def get_hint
      black_check = Array.new
      white_check = Array.new
 
+     guess_copy = @guess.dup
+    @hint = []
+
     @code.each_with_index{ |c, i|
-      if(@guess[i] == c)
+      if(guess_copy[i] == c)
         black_check<<:black
-        @guess[i] = nil
+        guess_copy[i] = nil
       else
         black_check<<:empty
       end
     }
 
-    @code.each_with_index { |c, i|
-      if(black_check[i] != :black)
-        @guess.each_with_index do |g, i|
-          if (g == c and white_check[i] != :white)
+    @code.each_with_index do |c, j|
+      if(black_check[j] != :black)
+        found = false
+        guess_copy.each_with_index do |g, i|
+          if (g == c and found == false and white_check[i] != :white)
             @hint<<:white
+            found = true
             white_check[i] = :white
           end
         end
       end
-    }
+    end
 
     black_check.each { |b|
       if(b == :black)
@@ -55,22 +64,54 @@ class Game
     @hint
   end
 
-  def guess_history
-    @guess_history<< @guess.join(" -- ")
-    return @guess_history
+  def guess_line
+    @guess_line = @guess.join(" -- ")
+    @guess_line
   end
 
-  def hint_history
-    @hint_history<< @hint.join(" -- ")
-    return @hint_history
+  def hint_line
+    @hint_line = @hint.join(" -- ")
+    @hint_line
+  end
+
+  def display_line
+    guess_number = (10 - @number_of_guesses_left)
+    line = "\nGuess number #{guess_number}: "
+    line<< guess_line.strip
+    line<< " |  Hint: "
+    line<< hint_line
+    line<< "\n\n"
+    line
   end
 
   def display_history
-    line = "Guess List: \n"
-    line<< guess_history
-    line<< "  |  Hint: "
-    line<< hint_history
-    line
+    @history<< display_line
+    @history
+  end
+
+  def display_guesses_remaining
+   line = "You have #{number_of_guesses_left} guesses remaining\n\n"
+   line
+  end
+
+  def won?
+    if(@guess == @code)
+      code_text = @code.collect { |x| x.to_s + " "}
+      puts "Congratulations! You guessed the code!!! It was #{code_text}. Good Job."
+      true
+    else
+      false
+    end
+  end
+
+  def lost?
+    if(number_of_guesses_left == 0)
+      code_text = @code.collect { |x| x.to_s + " "}
+      puts "Sorry, you ran out of guesses. The secret code was #{code_text}"
+      true
+    else
+      false
+    end
   end
 
   def intro
@@ -84,14 +125,20 @@ class Game
 
   def run_game
     print intro
-    @number_of_guesses= 10
-    code
+    set_secret_code
+    until (won? or lost?) do
+      guess
+      if(won?)
+        break
+      end
+      get_hint
+      print display_history
+      print display_guesses_remaining
+    end
+  end
+
+  class App
+  game = Game.new
+  game.run_game
   end
 end
-#
-#class App
-#
-#game = Game.new
-#
-#game.run_game
-#end

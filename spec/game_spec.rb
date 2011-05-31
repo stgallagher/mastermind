@@ -13,18 +13,18 @@ describe Game do
 
   it "starts with a secret code" do
     game = Game.new
-    game.code.should_not be(nil)
+    game.set_secret_code.should_not be(nil)
 
   end
 
   it "secret code should contain 4 elements" do
     game = Game.new
-    game.code.size.should == 4
+    game.set_secret_code.size.should == 4
   end
 
   it "secret code should hold four symbols" do
     game = Game.new
-    game.code.each {|i| i.class.should == Symbol}
+    game.set_secret_code.each {|i| i.class.should == Symbol}
   end
 
   it "the symbols held in the secret code should be equal to red, yellow, blue or green" do
@@ -34,7 +34,7 @@ describe Game do
     test_array = Array.new(4, "fail")
     test_colors = [:red, :yellow, :blue, :green]
 
-    game.code.each {|i|
+    game.set_secret_code.each {|i|
       test_colors.each {|test|
         if test == i
         test_array[index] = "pass"
@@ -49,7 +49,7 @@ describe Game do
     game1 = Game.new
     game2 = Game.new
 
-    game1.code.should_not == game2.code
+    game1.set_secret_code.should_not == game2.set_secret_code
   end
 
 #  it "should have a prompt message that asks the user for a guess" do
@@ -67,28 +67,28 @@ describe Game do
     game = Game.new
     game.code= [:empty, :empty, :empty, :empty]
     game.guess= [:empty, :empty, :empty, :empty]
-    game.hint.should_not == nil
+    game.get_hint.should_not == nil
   end
 
   it "should create a set of hint pegs" do
     game = Game.new
     game.code= [:empty, :empty, :empty, :empty]
     game.guess= [:empty, :empty, :empty, :empty]
-    game.hint.class.should == Array
+    game.get_hint.class.should == Array
   end
 
   it "hint set should be of length 4" do
     game = Game.new
     game.code= [:empty, :empty, :empty, :empty]
     game.guess= [:empty, :empty, :empty, :empty]
-    game.hint.size.should == 4
+    game.get_hint.size.should == 4
   end
 
   it "hint set should be 4 symbols" do
     game = Game.new
     game.code= [:empty, :empty, :empty, :empty]
     game.guess= [:empty, :empty, :empty, :empty]
-    game.hint.each {|i| i.class.should == Symbol}
+    game.get_hint.each {|i| i.class.should == Symbol}
   end
 
   # hint set is based on matching the guess set to the code set. If there is a match of color and position, then a
@@ -99,21 +99,21 @@ describe Game do
       game = Game.new
       game.guess= [:red, :red, :red, :red]
       game.code= [:red, :red, :red, :red]
-      game.hint.should == [:black, :black, :black, :black]
+      game.get_hint.should == [:black, :black, :black, :black]
   end
 
   it "hint set should yield empty if no colors match between the guess and code match" do
       game = Game.new
       game.guess= [:green, :green, :green, :green]
       game.code= [:red, :red, :red, :red]
-      game.hint.should == []
+      game.get_hint.should == []
   end
 
   it "hint set should yield [:black, :black] if guess = [blue, red, red, red] and code = [blue, green, yellow, red]" do
       game = Game.new
       game.guess = [:blue, :red, :red, :red]
       game.code = [:blue, :green, :yellow, :red]
-      game.hint.should == [:black, :black]
+      game.get_hint.should == [:black, :black]
   end
 
   it "hint set should yield [:black, :black, :white, :white] if guess = [blue, blue, red, yellow] and
@@ -122,7 +122,7 @@ describe Game do
 
       game.guess = [:blue, :blue, :red, :yellow]
       game.code = [:blue, :blue, :yellow, :red]
-      game.hint.should == [:black, :black, :white, :white]
+      game.get_hint.should == [:black, :black, :white, :white]
   end
 
   it "hint set should yield [:white, :white, :white, :white] if guess = [blue, blue, red, yellow] and
@@ -131,7 +131,7 @@ describe Game do
 
       game.guess = [:blue, :blue, :red, :yellow]
       game.code = [:red, :yellow, :blue, :blue]
-      game.hint.should == [:white, :white, :white, :white]
+      game.get_hint.should == [:white, :white, :white, :white]
   end
 
    it "hint set should yield [:black, :black, :white, :white] if guess = [blue, blue, red, yellow] and
@@ -140,7 +140,7 @@ describe Game do
 
       game.guess = [:blue, :blue, :red, :yellow]
       game.code = [:blue, :yellow, :red, :blue]
-      game.hint.should == [:black, :black, :white, :white]
+      game.get_hint.should == [:black, :black, :white, :white]
    end
 
   it "hint set should yield [:black, :white, :white, :white] if guess = [blue, yellow, red, green] and
@@ -149,7 +149,15 @@ describe Game do
 
       game.guess = [:blue, :yellow, :red, :green]
       game.code = [:yellow, :green, :red, :blue]
-      game.hint.should == [:black, :white, :white, :white]
+      game.get_hint.should == [:black, :white, :white, :white]
+  end
+
+  it "hint set should yield [:black, :white, :white] if guess = [red, red, blue, red] and
+      code = [red, green, red, blue]" do
+      game = Game.new
+      game.guess = [:red, :red, :blue, :red]
+      game.code = [:red, :green, :red, :blue]
+      game.get_hint.should == [:black, :white, :white]
   end
 
   it "hint set should yield [:black] if guess = [blue, blue, red, yellow] and
@@ -158,7 +166,7 @@ describe Game do
 
       game.guess = [:blue, :blue, :red, :yellow]
       game.code = [:blue, :green, :green, :green]
-      game.hint.should == [:black]
+      game.get_hint.should == [:black]
   end
 
    it "hint set should yield [:white] if guess = [blue, blue, red, red] and
@@ -167,44 +175,36 @@ describe Game do
 
       game.guess = [:red, :blue, :red, :red]
       game.code = [:blue, :green, :green, :green]
-      game.hint.should == [:white]
+      game.get_hint.should == [:white]
    end
 
    it "history should display something" do
     game = Game.new
 
     game.guess = [:red, :blue, :red, :red]
-    game.guess_history.should_not == nil
+    game.guess_line.should_not == nil
    end
 
-  it "history should display a guess" do
+  it "guess_line should display a guess" do
     game = Game.new
     game.guess = [:red, :blue, :red, :red]
-    game.guess_history.should == "red -- blue -- red -- red"
+    game.guess_line.should == "red -- blue -- red -- red"
   end
 
-  it "history should display a history with multiple guesses" do
-    game = Game.new
-    game.guess = [:red, :blue, :red, :red]
-    game.guess_history
-    game.guess = [:green, :green, :red, :red]
-    game.guess_history.should == "red -- blue -- red -- red" + "green -- green -- red -- red"
-  end
-
-  it "hint history should display a hint" do
+  it "hint_line should display a hint" do
     game = Game.new
     game.guess = [:blue, :blue, :red, :yellow]
     game.code = [:red, :yellow, :blue, :blue]
-    game.hint
-    game.hint_history.should == "white -- white -- white -- white"
+    game.get_hint
+    game.hint_line.should == "white -- white -- white -- white"
   end
 
-  it "display_history should display a complete line of history" do
+  it "display_line should display a complete line of history" do
     game = Game.new
     game.guess = [:blue, :blue, :red, :yellow]
     game.code = [:red, :yellow, :blue, :blue]
-    game.hint
-    game.display_history.should == "Guess List: \nblue -- blue -- red -- yellow  |  Hint: white -- white -- white -- white"
+    game.get_hint
+    game.display_line.should == "\nGuess number 0: blue -- blue -- red -- yellow |  Hint: white -- white -- white -- white\n\n"
   end
 
   it "intro should display game title and instructions" do
@@ -217,7 +217,7 @@ describe Game do
         " have guessed the right combination of colors or you have ran out of guesses\n\n"
     end
 
-  it "prompt should receive a guess input from user" do
+  it "potential game method should receive a guess input from user" do
     io = MockKernel.new
     game = Game.new(io)
     io.gets_values<< "red,red,red,red"
@@ -225,8 +225,68 @@ describe Game do
     game.guess.should == [:red, :red, :red, :red]
   end
 
-  it "game run method should take in secret code" do
+  it "potential game method should receive a code from computer" do
     game = Game.new
-    game.run_game
-    end
+    game.set_secret_code.should_not == nil
+  end
+
+  it "potential game method, when guess and code are called, does not generate nil when hint is called" do
+    io = MockKernel.new
+    game = Game.new(io)
+    io.gets_values<< "red,red,red,red"
+
+    game.set_secret_code
+    game.guess
+    game.get_hint.should_not == []
+  end
+
+  it "potential game method, when guess and code are pre-set, display line should output appropriately" do
+    io = MockKernel.new
+    game = Game.new(io)
+    io.gets_values<< "red,red,blue,red"
+    game.guess
+    game.code= [:red, :green, :red, :blue]
+    game.get_hint
+    game.display_line.should == "\nGuess number 1: red -- red -- blue -- red |  Hint: black -- white -- white\n\n"
+  end
+
+  it "two guesses should yield two lines of history and correct output" do
+    io = MockKernel.new
+    game = Game.new(io)
+    io.gets_values<< "red,red,blue,red"
+    game.code= [:red, :green, :red, :blue]
+    game.guess
+    game.get_hint
+    game.display_history
+    #game.display_line.should == nil
+    io.gets_values<< "red,green,blue,blue"
+    game.guess
+    game.get_hint
+    game.display_history.should == "\nGuess number 1: red -- red -- blue -- red |  Hint: black -- white -- white\n\n" +
+                                   "\nGuess number 2: red -- green -- blue -- blue |  Hint: black -- black -- black\n\n"
+  end
+
+  it "number_of_guesses should decrement 1 with each call to guess" do
+    game = Game.new
+    game.guess
+    game.guess
+    game.guess
+    game.number_of_guesses_left.should == 7
+  end
+
+ it "random codes are sufficiently random" do
+   game = Game.new
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+   p game.set_secret_code
+ end
 end
